@@ -81,7 +81,7 @@
     return (n < 10 ? '0' : '') + n
   }
 
-  function atualizaHud(s, mudouNum) {
+  function atualizaHud(s) {
     var capa = s.hasAttribute('data-capa')
     if (capa) palco.setAttribute('data-capa', '')
     else palco.removeAttribute('data-capa')
@@ -91,11 +91,8 @@
     hudConta.textContent = dois(s._iq) + '/' + dois(totalQuem[s.dataset.quem])
     hudParte.textContent = q.titulo
     hudBarra.style.setProperty('--prog', s._num / numerados)
-    var restam = (+s.dataset.passos || 0) - passo
-    var pontos = ''
-    for (var i = 0; i < restam; i++) pontos += '<i></i>'
-    hudPag.innerHTML = (restam > 0 ? '<span class="hud-passos" title="cliques restantes neste slide">' + pontos + '</span>' : '') + dois(s._num) + ' / ' + dois(numerados)
-    if (mudouNum) hudNum.innerHTML = '<span class="entra">' + dois(s._num) + '</span>'
+    hudPag.textContent = dois(s._num) + ' / ' + dois(numerados)
+    hudNum.innerHTML = '<span class="entra">' + dois(s._num) + '</span>'
   }
 
   /* ---------- navegação ---------- */
@@ -108,10 +105,37 @@
     for (var i = 1; i <= 3; i++) s.classList.toggle('p' + i, i <= passo && i <= max)
   }
 
+  // Um toque, um slide: o que entra em etapas (data-passos) entra sozinho, nos tempos
+  // de data-tempos (ms depois da entrada). Ninguém precisa apertar duas vezes.
+  var relogios = []
+  function paraPassos() {
+    relogios.forEach(clearTimeout)
+    relogios = []
+  }
+  function agendaPassos(s) {
+    var max = +s.dataset.passos || 0
+    var tempos = (s.dataset.tempos || '').split(',').map(Number)
+    for (var n = passo + 1; n <= max; n++) {
+      relogios.push(
+        setTimeout(
+          function (n) {
+            if (slides[atual] !== s) return
+            passo = n
+            aplicaPassos(s)
+            entraPasso(s, n)
+          },
+          tempos[n - 1] || 1500 * n,
+          n
+        )
+      )
+    }
+  }
+
   function vai(n, opts) {
     opts = opts || {}
     n = Math.max(0, Math.min(slides.length - 1, n))
     if (n === atual || travado) return
+    paraPassos()
     var ant = slides[atual]
     var nov = slides[n]
     var dir = n > atual ? 1 : -1
@@ -134,12 +158,13 @@
     function mostra() {
       palco.dataset.tema = nov.dataset.quem
       document.body.dataset.quem = nov.dataset.quem
-      atualizaHud(nov, true)
+      atualizaHud(nov)
       // um quadro de folga pro navegador registrar o estado inicial antes da transição
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           nov.classList.add('ativo')
           entra(nov)
+          agendaPassos(nov)
         })
       })
     }
@@ -151,26 +176,11 @@
   }
 
   function proximo() {
-    var s = slides[atual]
-    var max = +s.dataset.passos || 0
-    if (passo < max) {
-      passo++
-      aplicaPassos(s)
-      atualizaHud(s, false)
-      entraPasso(s, passo)
-      return
-    }
     vai(atual + 1)
   }
 
+  // voltando, o slide aparece já completo
   function anterior() {
-    var s = slides[atual]
-    if (passo > 0) {
-      passo--
-      aplicaPassos(s)
-      atualizaHud(s, false)
-      return
-    }
     vai(atual - 1, { passoFinal: true })
   }
 
@@ -283,6 +293,17 @@
       html += '<i class="' + cls + '" style="--o:' + (col + lin) + '"></i>'
     }
     w.innerHTML = html
+  })
+
+  /* ---------- rolos do caça-níquel: cada célula é uma curtida ---------- */
+  var CORACAO = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.2C.4 8.6 2.2 4.5 6 4.5c2.3 0 3.6 1.3 6 3.6 2.4-2.3 3.7-3.6 6-3.6 3.8 0 5.6 4.1 4 7.3C19.5 16.4 12 21 12 21z"/></svg>'
+  Array.prototype.forEach.call(palco.querySelectorAll('[data-fita]'), function (f) {
+    f.innerHTML = f.dataset.fita
+      .split('|')
+      .map(function (v) {
+        return '<span' + (v === '0' ? ' class="zero"' : '') + '>' + CORACAO + v + '</span>'
+      })
+      .join('')
   })
 
   /* ---------- comparador antes e depois ---------- */

@@ -263,7 +263,7 @@ strong {
   transition: none !important;
 }
 
-/* passos: elemento com data-p="N" só aparece depois do N-ésimo clique */
+/* passos: elemento com data-p="N" entra sozinho na N-ésima etapa (tempos em data-tempos) */
 .slide:not(.p1) [data-p='1'],
 .slide:not(.p2) [data-p='2'],
 .slide:not(.p3) [data-p='3'] {
@@ -675,19 +675,8 @@ mark::before {
   letter-spacing: 0.16em;
   color: var(--texto-2);
 }
-.hud-passos {
-  display: inline-flex;
-  gap: 6px;
-  margin-right: 16px;
-  vertical-align: middle;
-}
-.hud-passos i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--acento);
-  animation: pisca 1.4s ease-in-out infinite;
-}
+
+/* piscar (REC do vídeo, cursor) */
 @keyframes pisca {
   50% {
     opacity: 0.25;

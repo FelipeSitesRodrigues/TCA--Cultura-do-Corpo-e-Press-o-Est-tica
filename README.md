@@ -14,7 +14,7 @@ Site estático de slides, com animação, vídeo e gráficos. Sem framework e se
 | Tela cheia | F |
 | Começo / fim | Home / End |
 
-Bolinhas piscando no canto de baixo: ainda tem clique naquele slide. No slide 14 a alça do comparador pode ser arrastada.
+Um toque, um slide: o que entra em etapas (`data-passos` e `data-tempos` no slide) entra sozinho. No slide 17 a alça do comparador pode ser arrastada.
 
 Sem internet, abrir `dist/index.html` direto do disco funciona igual.
 
@@ -26,6 +26,7 @@ Sem internet, abrir `dist/index.html` direto do disco funciona igual.
 - `src/css/slides.css`: estilo de cada slide
 - `src/js/deck.js`: navegação, contadores, vídeo, comparador e grade de pontos
 - `src/img/imagens.json`: recorte, cor e tamanho de cada foto
+- `src/svg/`: desenho que entra inline no slide com `<!-- @svg nome id -->` (o cérebro dos slides 07 e 08)
 - `dist/`: o que vai pro ar (a Vercel serve essa pasta sem build)
 
 ## Comandos

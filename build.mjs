@@ -3,6 +3,7 @@
 // - junta src/index.html com os slides de src/slides/ (ordem do nome do arquivo)
 // - trata as fotos do manifesto src/img/imagens.json (recorte, cor, tamanho) e grava webp
 // - troca src="@img/nome" pelo arquivo final, com width e height
+// - troca <!-- @svg nome id --> pelo SVG de src/svg/nome.svg (o "ID" de dentro vira o id dado)
 // - copia css, js, fontes e vídeo
 // Foto que ainda não existe vira um quadro cinza com o nome, pra o layout não quebrar.
 import { readdir, readFile, writeFile, mkdir, cp, rm } from 'node:fs/promises'
@@ -75,6 +76,12 @@ await Promise.all(Object.entries(manifesto).map(([n, c]) => trata(n, c)))
 const arquivos = (await readdir(`${SRC}/slides`)).filter((f) => f.endsWith('.html')).sort()
 const slides = await Promise.all(arquivos.map((f) => readFile(`${SRC}/slides/${f}`, 'utf8')))
 let html = (await readFile(`${SRC}/index.html`, 'utf8')).replace('<!-- @slides -->', slides.join('\n'))
+
+// desenho em SVG que entra inline (pra o CSS animar cada traço); ID evita id repetido na página
+const svgs = {}
+for (const [, nome] of html.matchAll(/<!-- @svg ([\w-]+) [\w-]+ -->/g))
+  svgs[nome] ??= (await readFile(`${SRC}/svg/${nome}.svg`, 'utf8')).replace(/^<!--[\s\S]*?-->\s*/, '').trim()
+html = html.replace(/<!-- @svg ([\w-]+) ([\w-]+) -->/g, (_, nome, id) => svgs[nome].replaceAll('ID-', id + '-'))
 
 const semManifesto = new Set()
 html = html.replace(/src="@img\/([\w-]+)"/g, (_, nome) => {

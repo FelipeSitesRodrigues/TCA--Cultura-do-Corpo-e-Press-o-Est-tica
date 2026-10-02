@@ -459,21 +459,6 @@
     transform: scale(1);
   }
 }
-.doc-dica {
-  position: absolute;
-  left: 46px;
-  bottom: 14px;
-  font-stretch: 112%;
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #888;
-  transition: opacity 0.4s;
-}
-.p1 .doc-dica {
-  opacity: 0;
-}
 .um-em-tres {
   position: absolute;
   right: 220px;
@@ -749,7 +734,758 @@
 }
 
 /* ==========================================================================
-   06 · VITRINE
+   06 · SÓ MAIS UMA OLHADA (caça-níquel da dopamina)
+   ========================================================================== */
+.maquina {
+  position: absolute;
+  right: 190px;
+  top: 250px;
+  width: 660px;
+  z-index: 4;
+}
+.maquina-corpo {
+  position: relative;
+  padding: 30px 30px 26px;
+  border-radius: 30px;
+  border: 1px solid rgba(var(--acento-rgb), 0.28);
+  background: linear-gradient(180deg, #121722 0%, #07090d 100%);
+  box-shadow:
+    0 50px 120px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.maquina-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+.maquina-seta {
+  width: 16px;
+  height: 16px;
+  border-right: 4px solid var(--acento);
+  border-bottom: 4px solid var(--acento);
+  rotate: 45deg;
+  margin: -8px 6px 0 0;
+}
+.ativo .maquina-seta {
+  animation: seta-puxa 1.2s var(--ease) 0.5s 3 both;
+}
+@keyframes seta-puxa {
+  0% {
+    transform: translate(-8px, -8px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(6px, 6px);
+    opacity: 0;
+  }
+}
+.rolos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.rolo {
+  position: relative;
+  height: 236px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #f4f6fa;
+}
+/* sombra de cilindro em cima e embaixo */
+.rolo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(6, 7, 10, 0.55) 0%, rgba(6, 7, 10, 0) 26%, rgba(6, 7, 10, 0) 74%, rgba(6, 7, 10, 0.55) 100%);
+}
+.rolo-fita {
+  transform: translateY(calc(var(--fim) * -236px));
+}
+.ativo .rolo-fita {
+  animation: gira calc(var(--t) * 1ms) cubic-bezier(0.3, 0.05, 0.25, 1) 0.95s both;
+}
+@keyframes gira {
+  0% {
+    transform: translateY(0);
+  }
+  88% {
+    transform: translateY(calc(var(--fim) * -236px - 34px));
+  }
+  100% {
+    transform: translateY(calc(var(--fim) * -236px));
+  }
+}
+.rolo-fita span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 236px;
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: 42px;
+  line-height: 1;
+  color: #06070a;
+  white-space: nowrap;
+}
+.rolo-fita svg {
+  width: 52px;
+  height: 52px;
+  fill: #ff3b5c;
+}
+.rolo-fita .zero {
+  color: rgba(6, 7, 10, 0.32);
+}
+.rolo-fita .zero svg {
+  fill: none;
+  stroke: rgba(6, 7, 10, 0.3);
+  stroke-width: 2;
+}
+/* o rolo do meio para no prêmio e acende */
+.rolo.premio::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 0 5px var(--marca),
+    0 0 0 0 rgba(var(--acento-rgb), 0);
+  opacity: 0;
+}
+.ativo .rolo.premio::before {
+  animation: premio 1.6s ease-out 3.2s both;
+}
+@keyframes premio {
+  0% {
+    opacity: 0;
+  }
+  12%,
+  36% {
+    opacity: 1;
+  }
+  24% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* traço da dopamina embaixo dos rolos */
+.pulso {
+  position: relative;
+  margin-top: 22px;
+  padding: 16px 0 0;
+  border-top: 1px solid rgba(var(--acento-rgb), 0.18);
+}
+.pulso svg {
+  display: block;
+  width: 100%;
+  height: 96px;
+  overflow: visible;
+}
+.pulso-base {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 2;
+  stroke-dasharray: 4 8;
+}
+.pulso-linha {
+  fill: none;
+  stroke: var(--acento);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 10px rgba(var(--acento-rgb), 0.7));
+}
+.ativo .pulso-linha {
+  animation: traca 3.2s linear 0.7s both;
+}
+@keyframes traca {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.pulso-rot {
+  position: absolute;
+  top: 14px;
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.pulso-rot {
+  left: 0;
+  color: var(--acento);
+}
+.pulso-rot em {
+  font-style: normal;
+  color: var(--texto-3);
+}
+.pulso-espera {
+  position: absolute;
+  left: 0;
+  top: 46px;
+  font-size: 19px;
+  color: var(--texto-2);
+  white-space: nowrap;
+}
+.pulso-espera b {
+  color: #fff;
+}
+.ativo .pulso-espera {
+  animation: aparece 0.6s var(--ease) 2.2s both;
+}
+/* alavanca: o braço tomba pra frente (rotateX) e volta */
+.alavanca {
+  position: absolute;
+  right: -52px;
+  top: 70px;
+  width: 52px;
+  height: 260px;
+  perspective: 700px;
+}
+.alavanca-base {
+  position: absolute;
+  left: 0;
+  bottom: 30px;
+  width: 30px;
+  height: 64px;
+  border-radius: 0 12px 12px 0;
+  background: linear-gradient(90deg, #1b2230, #2a3446);
+}
+.alavanca-braco {
+  position: absolute;
+  left: 16px;
+  bottom: 60px;
+  width: 12px;
+  height: 190px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #9aa6b8, #e6ecf5 50%, #8a95a8);
+  transform-origin: 50% 100%;
+}
+.alavanca-bola {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  width: 46px;
+  height: 46px;
+  margin-left: -23px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, var(--acento) 30%, var(--marca) 75%);
+  box-shadow: 0 0 30px rgba(var(--acento-rgb), 0.6);
+}
+.ativo .alavanca-braco {
+  animation: puxa 1.1s cubic-bezier(0.5, 0, 0.3, 1) 0.45s both;
+}
+@keyframes puxa {
+  0% {
+    transform: rotateX(0);
+  }
+  42% {
+    transform: rotateX(170deg);
+  }
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+/* ==========================================================================
+   07 e 08 · CÉREBRO (desenho do Gray, src/svg/cerebro.svg)
+   Entra com uma varredura de ressonância da esquerda pra direita: a janela
+   anda pra direita e o desenho anda ao contrário, então ele fica parado e
+   só a borda se move (transform puro).
+   ========================================================================== */
+.cerebro {
+  position: absolute;
+  right: 70px;
+  top: 222px;
+  width: 820px;
+  aspect-ratio: 942 / 560;
+  z-index: 3;
+}
+.cerebro-janela {
+  position: absolute;
+  inset: -40px;
+  overflow: hidden;
+}
+.cerebro-mov {
+  position: absolute;
+  inset: 40px;
+}
+.ativo .cerebro-janela {
+  animation: janela-cerebro 1.9s cubic-bezier(0.6, 0, 0.3, 1) 0.25s both;
+}
+.ativo .cerebro-mov {
+  animation: janela-cerebro-inv 1.9s cubic-bezier(0.6, 0, 0.3, 1) 0.25s both;
+}
+@keyframes janela-cerebro {
+  from {
+    transform: translateX(-100%);
+  }
+}
+@keyframes janela-cerebro-inv {
+  from {
+    transform: translateX(100%);
+  }
+}
+.cerebro-scan {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  background: var(--acento);
+  box-shadow:
+    0 0 24px 6px rgba(var(--acento-rgb), 0.7),
+    0 0 90px 20px rgba(var(--acento-rgb), 0.25);
+  opacity: 0;
+}
+.ativo .cerebro-scan {
+  animation: scan 1.9s linear 0.25s both;
+}
+@keyframes scan {
+  0%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.cerebro-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.c-dentro {
+  fill: rgba(var(--acento-rgb), 0.05);
+}
+.c-linhas path {
+  fill: rgba(214, 232, 255, 0.86);
+}
+.c-linhas .c-borda {
+  fill: rgba(214, 232, 255, 0.95);
+}
+
+/* brilhos: nascem apagados, cada slide liga o seu */
+.luz-freio,
+.luz-recompensa,
+.alvo {
+  opacity: 0;
+}
+.alvo-pto {
+  fill: #fff;
+}
+.alvo-anel,
+.alvo-onda {
+  fill: none;
+  stroke: var(--acento);
+  stroke-width: 3;
+}
+.alvo-anel {
+  stroke-dasharray: 6 7;
+}
+.alvo-onda {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+}
+.obra {
+  fill: none;
+  stroke: rgba(var(--acento-rgb), 0.45);
+  stroke-width: 7;
+}
+
+/* etiqueta presa num ponto do desenho (left/top em % do desenho) */
+.cerebro-tag {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 18px 13px;
+  background: rgba(6, 7, 10, 0.86);
+  border: 1px solid rgba(var(--acento-rgb), 0.5);
+  white-space: nowrap;
+  opacity: 0;
+}
+.cerebro-tag b {
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: 24px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.cerebro-tag em {
+  font-style: normal;
+  font-stretch: 118%;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+
+@keyframes acende {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes respira {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes onda {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+@keyframes tag-entra {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   07 · O PODER DO LIKE
+   ========================================================================== */
+.like .luz-recompensa,
+.like .alvo,
+.like .cerebro-tag {
+  opacity: 1;
+}
+.ativo.like .luz-recompensa {
+  animation:
+    acende 0.9s ease-out 3s both,
+    respira 2.6s ease-in-out 4s infinite;
+}
+.ativo.like .alvo {
+  animation: acende 0.5s ease-out 2.9s both;
+}
+.ativo.like .alvo-onda {
+  animation: onda 2.2s ease-out 3s infinite;
+}
+.ativo.like .alvo-onda.o2 {
+  animation-delay: 4.1s;
+}
+.like .tag-accumbens {
+  transform: none;
+  translate: 40px -130%;
+}
+.ativo.like .tag-accumbens {
+  animation: tag-entra 0.7s var(--ease) 3.3s both;
+}
+
+/* sinal subindo do post até o cérebro */
+.sinal {
+  position: absolute;
+  left: 1264px;
+  top: 584px;
+  width: 0;
+  height: 176px;
+  border-left: 3px dotted rgba(var(--acento-rgb), 0.6);
+  z-index: 3;
+  opacity: 1;
+}
+.sinal b {
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 18px 4px rgba(var(--acento-rgb), 0.9);
+  opacity: 0;
+}
+.ativo .sinal {
+  animation: acende 0.4s ease 1.6s both;
+}
+.ativo .sinal b {
+  animation: sobe-sinal 0.9s cubic-bezier(0.5, 0, 0.8, 0.6) 1.8s 3 both;
+}
+@keyframes sobe-sinal {
+  0% {
+    opacity: 0;
+    transform: translateY(176px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.post {
+  position: absolute;
+  left: 1110px;
+  top: 760px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: 470px;
+  padding: 16px 26px 16px 16px;
+  border-radius: 22px;
+  background: #fff;
+  color: #06070a;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+.post-foto {
+  flex: none;
+  width: 108px;
+  height: 108px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.post-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+}
+.post-txt b {
+  display: block;
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(6, 7, 10, 0.5);
+  margin-bottom: 8px;
+}
+.post-likes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 30px;
+  white-space: nowrap;
+}
+.post-likes svg {
+  width: 36px;
+  height: 36px;
+  fill: #ff3b5c;
+}
+.post-likes span {
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: 44px;
+  font-variant-numeric: tabular-nums;
+}
+.ativo .post-likes svg {
+  animation: pulsa-coracao 0.5s var(--ease-volta) 3s 2 both;
+}
+@keyframes pulsa-coracao {
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+/* ==========================================================================
+   08 · FREIO EM OBRA
+   ========================================================================== */
+.freio .col-texto .pontos {
+  margin-top: 36px;
+}
+.freio .nota {
+  margin-top: 32px;
+}
+.freio .cerebro {
+  top: 214px;
+}
+.freio .luz-freio,
+.freio .luz-recompensa,
+.freio .alvo,
+.freio .cerebro-tag {
+  opacity: 1;
+}
+.freio .luz-freio {
+  opacity: 0.75;
+}
+.ativo.freio .luz-freio {
+  animation: acende-meio 1.2s ease-out 2.4s both;
+}
+@keyframes acende-meio {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.75;
+  }
+}
+/* listras de obra andando */
+.ativo.freio .obra {
+  animation: listras 1.6s linear infinite;
+}
+@keyframes listras {
+  to {
+    transform: translateX(26px);
+  }
+}
+.ativo.freio .luz-recompensa {
+  animation:
+    acende 0.6s ease-out 2s both,
+    respira 1.1s ease-in-out 2.6s infinite;
+}
+.ativo.freio .alvo {
+  animation: acende 0.4s ease-out 2s both;
+}
+.ativo.freio .alvo-onda {
+  animation: onda 1.1s ease-out 2.1s infinite;
+}
+.ativo.freio .alvo-onda.o2 {
+  animation-delay: 2.65s;
+}
+.tag-freio {
+  translate: -30% -170%;
+}
+.tag-acel {
+  translate: 40px -40%;
+}
+.ativo.freio .tag-freio {
+  animation: tag-entra 0.7s var(--ease) 2.8s both;
+}
+.ativo.freio .tag-acel {
+  animation: tag-entra 0.7s var(--ease) 2.2s both;
+}
+
+/* régua da idade: feito até os 17, listrado até os 25 */
+.regua {
+  position: absolute;
+  left: 1110px;
+  top: 762px;
+  width: 700px;
+  z-index: 4;
+}
+.regua-tit {
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+  margin-bottom: 66px;
+}
+.regua-trilho {
+  position: relative;
+  height: 26px;
+  border-radius: 13px;
+  border: 1px solid rgba(var(--acento-rgb), 0.4);
+}
+.regua-obra {
+  position: absolute;
+  inset: 3px;
+  border-radius: 10px;
+  background: repeating-linear-gradient(-45deg, rgba(var(--acento-rgb), 0.28) 0 10px, transparent 10px 20px);
+}
+/* 10 a 17 anos = 7 de 15 */
+.regua-feito {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  bottom: 3px;
+  width: calc((100% - 6px) * 7 / 15);
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--marca), var(--acento));
+  transform-origin: left center;
+}
+.ativo .regua-feito {
+  animation: enche 1.6s var(--ease) 2s both;
+}
+@keyframes enche {
+  from {
+    transform: scaleX(0);
+  }
+}
+.regua-nos {
+  position: absolute;
+  left: calc(100% * 7 / 15);
+  bottom: calc(100% + 12px);
+  translate: -50% 0;
+  padding: 5px 12px;
+  background: #fff;
+  color: #06070a;
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: 18px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.regua-nos::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 2px;
+  height: 40px;
+  margin-left: -1px;
+  background: #fff;
+}
+.ativo .regua-nos {
+  animation: tag-entra 0.6s var(--ease) 3.3s both;
+}
+.regua-anos {
+  position: relative;
+  height: 20px;
+  margin-top: 12px;
+  font-stretch: 112%;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--texto-3);
+}
+.regua-anos span {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+  white-space: nowrap;
+}
+.regua-anos span:last-child {
+  color: #fff;
+}
+
+/* ==========================================================================
+   09 · VITRINE
    ========================================================================== */
 .vitrine .foto-dir {
   width: 50%;
@@ -888,7 +1624,7 @@
 }
 
 /* ==========================================================================
-   07 · BRASIL Nº 1
+   10 · BRASIL Nº 1
    ========================================================================== */
 .brasil-foto {
   width: 50%;
@@ -943,7 +1679,7 @@
 }
 
 /* ==========================================================================
-   08 · NO BOLSO
+   11 · NO BOLSO
    ========================================================================== */
 .bolso-foto {
   width: 46%;
@@ -1032,7 +1768,7 @@
 }
 
 /* ==========================================================================
-   09 · A PIOR REDE
+   12 · A PIOR REDE
    ========================================================================== */
 .rede .col-texto {
   width: 880px;
@@ -1127,7 +1863,7 @@
 }
 
 /* ==========================================================================
-   10 · COMPARAÇÃO CONSTANTE
+   13 · COMPARAÇÃO CONSTANTE
    ========================================================================== */
 .comparacao .foto-dir {
   width: 50%;
@@ -1185,7 +1921,7 @@
 }
 
 /* ==========================================================================
-   11 · 212 MENINAS
+   14 · 212 MENINAS
    ========================================================================== */
 .meninas .col-texto {
   width: 840px;
@@ -1268,7 +2004,7 @@
 }
 
 /* ==========================================================================
-   12 · COMO A IMAGEM É CONSTRUÍDA
+   15 · COMO A IMAGEM É CONSTRUÍDA
    ========================================================================== */
 .construida-foto {
   width: 50%;
@@ -1393,7 +2129,7 @@
 }
 
 /* ==========================================================================
-   13 · O PODER DA LUZ (vídeo)
+   16 · O PODER DA LUZ (vídeo)
    ========================================================================== */
 .luz .col-texto {
   width: 640px;
@@ -1479,7 +2215,7 @@
 }
 
 /* ==========================================================================
-   14 · MESMO CORPO (comparador)
+   17 · MESMO CORPO (comparador)
    ========================================================================== */
 .mesmo-texto {
   width: 690px;
@@ -1604,7 +2340,7 @@
 }
 
 /* ==========================================================================
-   15 · EDIÇÃO E FILTROS
+   18 · EDIÇÃO E FILTROS
    ========================================================================== */
 .rosto {
   position: absolute;
@@ -1730,7 +2466,7 @@
 }
 
 /* ==========================================================================
-   16 · PEQUENO DEMAIS (espelho)
+   19 · PEQUENO DEMAIS (espelho)
    ========================================================================== */
 .pequeno .col-texto {
   width: 880px;
@@ -1818,7 +2554,7 @@
 }
 
 /* ==========================================================================
-   17 · NEM TODO SHAPE É TREINO
+   20 · NEM TODO SHAPE É TREINO
    ========================================================================== */
 .shape-topo {
   position: absolute;
@@ -2000,7 +2736,7 @@
 }
 
 /* ==========================================================================
-   18 · O GRÁFICO
+   21 · O GRÁFICO
    ========================================================================== */
 .grafico-topo {
   position: absolute;
@@ -2219,7 +2955,7 @@
 }
 
 /* ==========================================================================
-   19 · ELAS E ELES (barras divergentes)
+   22 · ELAS E ELES (barras divergentes)
    ========================================================================== */
 .sexos-topo {
   position: absolute;
@@ -2368,7 +3104,7 @@
 }
 
 /* ==========================================================================
-   20 · O PREÇO
+   23 · O PREÇO
    ========================================================================== */
 .preco-topo {
   position: absolute;
@@ -2484,7 +3220,7 @@
 }
 
 /* ==========================================================================
-   21 · ACADEMIA: ALIADA
+   24 · ACADEMIA: ALIADA
    ========================================================================== */
 .aliada-foto {
   width: 50%;
@@ -2525,7 +3261,7 @@
 }
 
 /* ==========================================================================
-   22 · A SAÍDA É COLETIVA
+   25 · A SAÍDA É COLETIVA
    ========================================================================== */
 .saida-topo {
   position: absolute;
@@ -2584,7 +3320,7 @@
 }
 
 /* ==========================================================================
-   23 · CONCLUSÃO
+   26 · CONCLUSÃO
    ========================================================================== */
 .conclusao-foto {
   width: 48%;
@@ -2619,7 +3355,7 @@
 }
 
 /* ==========================================================================
-   24 · OBRIGADO
+   27 · OBRIGADO
    ========================================================================== */
 .obrigado-foto {
   position: absolute;

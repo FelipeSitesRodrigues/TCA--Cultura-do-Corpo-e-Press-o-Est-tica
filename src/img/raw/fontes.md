@@ -42,3 +42,9 @@ Unsplash License: uso livre, inclusive sem atribuição. As fotos do Zyzz não t
 | cirurgia | cirurgia.jpg | https://unsplash.com/pt-br/fotografias/uma-pessoa-operando-uma-luz-medica-em-uma-sala-YzyXrKkTDG0 | César Badilla Miranda (Unsplash) | Unsplash License (uso livre, sem atribuição obrigatória) | 2400x1600 |
 | menina-celular | menina-celular-alt.jpg | https://unsplash.com/pt-br/fotografias/uma-mulher-em-uma-jaqueta-azul-olhando-para-seu-telefone-celular-kQ3JTemZo1E | Olena Kamenetska (Unsplash) | Unsplash License (uso livre, sem atribuição obrigatória) | 2400x1600 |
 | menina-celular | menina-celular.jpg | https://unsplash.com/pt-br/fotografias/mulher-apoiada-na-mesa-de-madeira-branca-enquanto-segura-o-smartphone-android-preto-w3jVXGkYZCw | Kev Costello (Unsplash) | Unsplash License (uso livre, sem atribuição obrigatória) | 2400x1600 |
+
+## Desenhos (src/svg)
+
+| desenho | arquivo | página de origem | autor | licença |
+|---|---|---|---|---|
+| cerebro | src/svg/cerebro.svg | https://commons.wikimedia.org/wiki/File:Gray726.svg | Henry Gray, Anatomy of the Human Body (1918), fig. 726 | Domínio público (Wikimedia Commons). Rótulos em latim tirados |
