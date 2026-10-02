@@ -1,0 +1,13 @@
+{
+  "name": "tca-2026-apresentacao",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "servir": "node scripts/servir.mjs dist 4173"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^25.12.0",
+    "sharp": "^0.35.5"
+  }
+}

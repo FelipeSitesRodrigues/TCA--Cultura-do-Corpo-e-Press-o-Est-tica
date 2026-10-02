@@ -1,0 +1,5 @@
+node_modules/
+revisao/
+# fotos originais ficam só no disco; o dist já tem as versões tratadas
+src/img/raw/*
+!src/img/raw/fontes.md

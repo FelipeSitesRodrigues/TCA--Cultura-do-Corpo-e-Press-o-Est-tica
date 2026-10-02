@@ -1,0 +1,825 @@
+/* ==========================================================================
+   TCA 2026 · base da apresentação
+   Palco fixo de 1920x1080 escalado pra caber na tela (deck.js).
+   A cor do fundo diz quem apresenta: felipe preto, davi azul profundo,
+   gabriel azul elétrico, brenno branco.
+   Animação só com transform e opacity. Elemento com .a entra quando o slide
+   recebe .ativo; fora dele volta pro estado inicial sem transição.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('../fonts/archivo.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Archivo';
+  src: url('../fonts/archivo-italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-style: italic;
+  font-display: block;
+}
+
+:root {
+  --preto: #06070a;
+  --profundo: #0c2878;
+  --eletrico: #2b5df2;
+  --branco: #f4f6fa;
+  --gelo: #8cc2ff;
+  --azul: #2e6bff;
+  --tinta: #0a0f1e;
+  --serie-1: #2b5df2;
+  --serie-2: #12a0d8;
+  --serie-3: #5d5fa8;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-volta: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --pad-x: 110px;
+}
+
+/* ---------- temas por apresentador ---------- */
+[data-quem='felipe'],
+[data-tema='felipe'] {
+  --fundo: #06070a;
+  --fundo-rgb: 6, 7, 10;
+  --texto: #ffffff;
+  --texto-2: rgba(255, 255, 255, 0.66);
+  --texto-3: rgba(255, 255, 255, 0.42);
+  --linha: rgba(255, 255, 255, 0.14);
+  --cartao: rgba(255, 255, 255, 0.045);
+  --marca: #2e6bff;
+  --marca-texto: #ffffff;
+  --acento: #8cc2ff;
+  --acento-rgb: 140, 194, 255;
+  --num: rgba(255, 255, 255, 0.24);
+  --cor-quem: #06070a;
+}
+[data-quem='davi'],
+[data-tema='davi'] {
+  --fundo: #0c2878;
+  --fundo-rgb: 12, 40, 120;
+  --texto: #ffffff;
+  --texto-2: rgba(255, 255, 255, 0.74);
+  --texto-3: rgba(255, 255, 255, 0.5);
+  --linha: rgba(255, 255, 255, 0.18);
+  --cartao: rgba(255, 255, 255, 0.07);
+  --marca: #2e6bff;
+  --marca-texto: #ffffff;
+  --acento: #8cc2ff;
+  --acento-rgb: 140, 194, 255;
+  --num: rgba(255, 255, 255, 0.26);
+  --cor-quem: #0c2878;
+}
+[data-quem='gabriel'],
+[data-tema='gabriel'] {
+  --fundo: #2b5df2;
+  --fundo-rgb: 43, 93, 242;
+  --texto: #ffffff;
+  --texto-2: rgba(255, 255, 255, 0.86);
+  --texto-3: rgba(255, 255, 255, 0.62);
+  --linha: rgba(255, 255, 255, 0.3);
+  --cartao: rgba(255, 255, 255, 0.1);
+  --marca: #071a5c;
+  --marca-texto: #ffffff;
+  --acento: #ffffff;
+  --acento-rgb: 255, 255, 255;
+  --num: rgba(255, 255, 255, 0.36);
+  --cor-quem: #2b5df2;
+}
+[data-quem='brenno'],
+[data-tema='brenno'] {
+  --fundo: #f4f6fa;
+  --fundo-rgb: 244, 246, 250;
+  --texto: #06070a;
+  --texto-2: rgba(6, 7, 10, 0.7);
+  --texto-3: rgba(6, 7, 10, 0.5);
+  --linha: rgba(6, 7, 10, 0.12);
+  --cartao: #ffffff;
+  --marca: #2e6bff;
+  --marca-texto: #06070a;
+  --acento: #2b5df2;
+  --acento-rgb: 43, 93, 242;
+  --num: rgba(6, 7, 10, 0.16);
+  --cor-quem: #f4f6fa;
+}
+
+/* ---------- tela e palco ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  background: var(--fundo, #06070a);
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-stretch: 100%;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.5s;
+  cursor: default;
+}
+.tela {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+.palco {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: var(--fundo);
+  color: var(--texto);
+}
+img,
+svg,
+video {
+  display: block;
+  max-width: none;
+}
+img {
+  height: auto;
+}
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure {
+  margin: 0;
+}
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+b,
+strong {
+  font-weight: 700;
+}
+
+/* ---------- slide ---------- */
+.slide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--fundo);
+  color: var(--texto);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(calc(var(--dir, 1) * 48px));
+  transition:
+    opacity 0.55s var(--ease),
+    transform 0.9s var(--ease),
+    visibility 0s linear 0.9s;
+}
+.slide.ativo {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.55s var(--ease) 0.08s,
+    transform 0.9s var(--ease) 0.08s,
+    visibility 0s;
+}
+.slide.saindo {
+  z-index: 1;
+  opacity: 0;
+  visibility: visible;
+  transform: translateX(calc(var(--dir, 1) * -48px));
+}
+.conteudo {
+  position: absolute;
+  inset: 170px var(--pad-x) 130px;
+  z-index: 3;
+}
+
+/* ---------- entradas ---------- */
+.a {
+  opacity: 0;
+  transition:
+    opacity 0.7s var(--ease),
+    transform 1s var(--ease);
+  transition-delay: calc(var(--d, 0) * 1ms + 180ms);
+}
+.a.sobe {
+  transform: translateY(44px);
+}
+.a.desce {
+  transform: translateY(-36px);
+}
+.a.esq {
+  transform: translateX(-60px);
+}
+.a.dir {
+  transform: translateX(60px);
+}
+.a.escala {
+  transform: scale(0.86);
+}
+.a.zoom {
+  transform: scale(1.12);
+  transition:
+    opacity 1s var(--ease),
+    transform 2.6s var(--ease);
+  transition-delay: calc(var(--d, 0) * 1ms + 100ms);
+}
+.a.linha {
+  opacity: 1;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 1.2s var(--ease);
+  transition-delay: calc(var(--d, 0) * 1ms + 180ms);
+}
+.a.linha-v {
+  opacity: 1;
+  transform: scaleY(0);
+  transform-origin: center top;
+  transition: transform 1.2s var(--ease);
+  transition-delay: calc(var(--d, 0) * 1ms + 180ms);
+}
+.ativo .a,
+.saindo .a {
+  opacity: 1;
+  transform: none;
+}
+.slide:not(.ativo) .a,
+.slide:not(.ativo) .a * {
+  transition: none !important;
+}
+
+/* passos: elemento com data-p="N" só aparece depois do N-ésimo clique */
+.slide:not(.p1) [data-p='1'],
+.slide:not(.p2) [data-p='2'],
+.slide:not(.p3) [data-p='3'] {
+  opacity: 0 !important;
+  transform: translateY(28px) !important;
+}
+[data-p] {
+  transition:
+    opacity 0.6s var(--ease),
+    transform 0.8s var(--ease);
+  transition-delay: calc(var(--dp, 0) * 1ms) !important;
+}
+
+/* ---------- tipografia ---------- */
+.titulo {
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  font-size: 96px;
+  line-height: 0.94;
+  letter-spacing: -0.005em;
+  color: var(--texto);
+}
+.titulo.menor {
+  font-size: 78px;
+}
+.titulo.mini {
+  font-size: 64px;
+}
+.titulo .l {
+  display: block;
+  overflow: hidden;
+  padding: 0.05em 0.16em 0.09em;
+  margin: -0.05em -0.16em -0.09em;
+}
+.titulo .li {
+  display: block;
+  transform: translateY(112%);
+  transition: transform 1.05s var(--ease);
+  transition-delay: calc(var(--d, 0) * 1ms + var(--i, 0) * 95ms + 200ms);
+}
+.ativo .titulo .li,
+.saindo .titulo .li {
+  transform: none;
+}
+mark {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  background: none;
+  color: var(--marca-texto);
+  padding: 0.04em 0.14em 0.02em 0.1em;
+  margin: 0 0.02em;
+  white-space: nowrap;
+}
+mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--marca);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.75s var(--ease);
+  transition-delay: calc(var(--d, 0) * 1ms + var(--i, 0) * 95ms + 700ms);
+}
+.ativo mark::before,
+.saindo mark::before {
+  transform: none;
+}
+.slide:not(.ativo) mark::before,
+.slide:not(.ativo) .titulo .li {
+  transition: none;
+}
+
+.rotulo {
+  font-stretch: 118%;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+.lead {
+  font-size: 34px;
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--texto-2);
+  max-width: 19em;
+}
+.texto {
+  font-size: 27px;
+  line-height: 1.4;
+  color: var(--texto-2);
+}
+.fonte {
+  position: absolute;
+  left: var(--pad-x);
+  bottom: 84px;
+  z-index: 4;
+  font-stretch: 112%;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--texto-3);
+}
+.num-grande {
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* pontos com marcador */
+.pontos {
+  display: grid;
+  gap: 22px;
+}
+.pontos li {
+  position: relative;
+  padding-left: 40px;
+  font-size: 27px;
+  line-height: 1.38;
+  color: var(--texto-2);
+}
+.pontos li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 0.5em;
+  width: 16px;
+  height: 16px;
+  border-right: 4px solid var(--acento);
+  border-top: 4px solid var(--acento);
+  transform: rotate(45deg) skew(-6deg, -6deg);
+}
+.pontos b {
+  color: var(--texto);
+}
+
+/* setas >>>>> */
+.setas {
+  display: inline-flex;
+  gap: 4px;
+  vertical-align: middle;
+}
+.setas i {
+  width: 20px;
+  height: 20px;
+  border-right: 5px solid var(--acento);
+  border-top: 5px solid var(--acento);
+  transform: rotate(45deg);
+  opacity: 0.25;
+}
+.ativo .setas i {
+  animation: seta 1.6s var(--ease) infinite;
+}
+.setas i:nth-child(2) {
+  animation-delay: 0.12s !important;
+}
+.setas i:nth-child(3) {
+  animation-delay: 0.24s !important;
+}
+.setas i:nth-child(4) {
+  animation-delay: 0.36s !important;
+}
+.setas i:nth-child(5) {
+  animation-delay: 0.48s !important;
+}
+@keyframes seta {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+/* ---------- foto ---------- */
+.foto {
+  position: absolute;
+  overflow: hidden;
+  z-index: 1;
+}
+.foto > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.foto-dir {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 54%;
+}
+.foto-dir::after,
+.foto.fade-esq::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(var(--fundo-rgb), 1) 0%, rgba(var(--fundo-rgb), 0.72) 16%, rgba(var(--fundo-rgb), 0) 46%),
+    linear-gradient(0deg, rgba(var(--fundo-rgb), 0.85) 0%, rgba(var(--fundo-rgb), 0) 26%),
+    linear-gradient(180deg, rgba(var(--fundo-rgb), 0.55) 0%, rgba(var(--fundo-rgb), 0) 22%);
+}
+.foto.sem-fade::after {
+  display: none;
+}
+
+/* ---------- luz de cima ---------- */
+.feixe {
+  position: absolute;
+  top: -60px;
+  left: var(--fx, 72%);
+  width: var(--fw, 980px);
+  height: 1180px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 2;
+}
+.feixe::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(var(--acento-rgb), 0.5) 0%, rgba(var(--acento-rgb), 0.14) 45%, rgba(var(--acento-rgb), 0) 92%);
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+  filter: blur(26px);
+  opacity: var(--fo, 0.55);
+}
+.feixe::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 44px;
+  width: 220px;
+  height: 64px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, #fff 0%, rgba(var(--acento-rgb), 0.7) 35%, rgba(var(--acento-rgb), 0) 100%);
+}
+.ativo .feixe {
+  animation: liga 1.3s linear both;
+  animation-delay: calc(var(--d, 0) * 1ms + 150ms);
+}
+@keyframes liga {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.9;
+  }
+  14% {
+    opacity: 0.1;
+  }
+  22% {
+    opacity: 0.8;
+  }
+  28% {
+    opacity: 0.25;
+  }
+  45%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- cartão ---------- */
+.cartao {
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+  padding: 30px 32px 32px;
+}
+.cartao-autor {
+  display: block;
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--acento);
+  margin-bottom: 14px;
+}
+.cartao h3 {
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  font-size: 30px;
+  line-height: 1.05;
+  margin-bottom: 14px;
+}
+.cartao p {
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--texto-2);
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  color: var(--texto);
+  transition: opacity 0.5s;
+}
+.palco[data-capa] .hud {
+  opacity: 0;
+}
+.hud-quem {
+  position: absolute;
+  left: var(--pad-x);
+  top: 64px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 19px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.hud-bolinha {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cor-quem);
+  box-shadow:
+    0 0 0 2px currentColor,
+    0 0 18px rgba(var(--acento-rgb), 0.6);
+}
+.hud-conta {
+  font-weight: 600;
+  opacity: 0.6;
+}
+.hud-parte {
+  font-weight: 600;
+  opacity: 0.6;
+  letter-spacing: 0.16em;
+}
+.hud-parte::before {
+  content: '·';
+  margin-right: 14px;
+}
+.hud-num {
+  position: absolute;
+  right: 92px;
+  top: 34px;
+  height: 196px;
+  overflow: hidden;
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 125%;
+  font-size: 200px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--num);
+}
+.hud-num span {
+  display: block;
+  text-align: right;
+}
+.hud-num span.entra {
+  animation: num-entra 0.9s var(--ease) both;
+}
+@keyframes num-entra {
+  from {
+    transform: translateY(calc(var(--dir, 1) * 60%));
+    opacity: 0;
+  }
+}
+.hud-barra {
+  position: absolute;
+  left: var(--pad-x);
+  right: 250px;
+  bottom: 52px;
+  height: 4px;
+  background: var(--linha);
+}
+.hud-barra i {
+  position: absolute;
+  inset: 0;
+  background: var(--acento);
+  transform-origin: left center;
+  transform: scaleX(var(--prog, 0));
+  transition: transform 0.9s var(--ease);
+}
+.hud-barra b {
+  position: absolute;
+  top: -5px;
+  width: 2px;
+  height: 14px;
+  background: var(--texto-3);
+}
+.hud-pag {
+  position: absolute;
+  right: var(--pad-x);
+  bottom: 40px;
+  font-stretch: 118%;
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.16em;
+  color: var(--texto-2);
+}
+.hud-passos {
+  display: inline-flex;
+  gap: 6px;
+  margin-right: 16px;
+  vertical-align: middle;
+}
+.hud-passos i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acento);
+  animation: pisca 1.4s ease-in-out infinite;
+}
+@keyframes pisca {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- cortina (troca de apresentador) ---------- */
+.cortina {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: var(--fundo);
+  color: var(--texto);
+  visibility: hidden;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+.cortina.entra {
+  visibility: visible;
+  animation: cortina-entra 0.6s var(--ease) both;
+}
+.cortina.sai {
+  visibility: visible;
+  animation: cortina-sai 0.7s cubic-bezier(0.7, 0, 0.3, 1) both;
+}
+@keyframes cortina-entra {
+  from {
+    transform: translateX(calc(var(--dir, 1) * 100%));
+  }
+}
+@keyframes cortina-sai {
+  to {
+    transform: translateX(calc(var(--dir, 1) * -100%));
+  }
+}
+.cortina-num {
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 125%;
+  font-size: 300px;
+  line-height: 0.9;
+  color: transparent;
+  -webkit-text-stroke: 3px var(--num);
+}
+.cortina-nome {
+  margin-top: 18px;
+  font-style: italic;
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: 120px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.cortina-parte {
+  margin-top: 26px;
+  font-stretch: 118%;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+.cortina.entra .cortina-nome,
+.cortina.entra .cortina-parte,
+.cortina.entra .cortina-num {
+  animation: sobe-cortina 0.8s var(--ease) both;
+}
+.cortina.entra .cortina-nome {
+  animation-delay: 0.12s;
+}
+.cortina.entra .cortina-parte {
+  animation-delay: 0.22s;
+}
+@keyframes sobe-cortina {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+/* ---------- grão de filme ---------- */
+.grao {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.palco[data-tema='brenno'] .grao {
+  opacity: 0.035;
+}
+
+/* ---------- dica de navegação ---------- */
+.dica {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  z-index: 50;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(6, 7, 10, 0.78);
+  color: #fff;
+  font: 600 13px/1 'Archivo', sans-serif;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+  transition: opacity 0.8s;
+}
+.dica.some {
+  opacity: 0;
+}
+
+/* sr-only em div: tabela solta dentro de sr-only estoura a largura */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- modo estático (print, PDF, reduzir movimento) ---------- */
+.estatico *,
+.estatico *::before,
+.estatico *::after {
+  transition: none !important;
+  animation: none !important;
+}
+.estatico .cortina {
+  display: none;
+}
