@@ -480,62 +480,6 @@ mark::before {
   display: none;
 }
 
-/* ---------- luz de cima ---------- */
-.feixe {
-  position: absolute;
-  top: -60px;
-  left: var(--fx, 72%);
-  width: var(--fw, 980px);
-  height: 1180px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  z-index: 2;
-}
-.feixe::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(var(--acento-rgb), 0.5) 0%, rgba(var(--acento-rgb), 0.14) 45%, rgba(var(--acento-rgb), 0) 92%);
-  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
-  filter: blur(26px);
-  opacity: var(--fo, 0.55);
-}
-.feixe::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 44px;
-  width: 220px;
-  height: 64px;
-  transform: translateX(-50%);
-  background: radial-gradient(closest-side, #fff 0%, rgba(var(--acento-rgb), 0.7) 35%, rgba(var(--acento-rgb), 0) 100%);
-}
-.ativo .feixe {
-  animation: liga 1.3s linear both;
-  animation-delay: calc(var(--d, 0) * 1ms + 150ms);
-}
-@keyframes liga {
-  0% {
-    opacity: 0;
-  }
-  8% {
-    opacity: 0.9;
-  }
-  14% {
-    opacity: 0.1;
-  }
-  22% {
-    opacity: 0.8;
-  }
-  28% {
-    opacity: 0.25;
-  }
-  45%,
-  100% {
-    opacity: 1;
-  }
-}
-
 /* ---------- cartão ---------- */
 .cartao {
   background: var(--cartao);

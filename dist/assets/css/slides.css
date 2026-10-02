@@ -2184,36 +2184,6 @@
   text-transform: uppercase;
   color: var(--texto-3);
 }
-.lampada {
-  position: absolute;
-  left: 50%;
-  top: -150px;
-  width: 0;
-  height: 0;
-}
-.lampada::before {
-  content: '';
-  position: absolute;
-  left: -2px;
-  top: -100px;
-  width: 4px;
-  height: 160px;
-  background: rgba(255, 255, 255, 0.5);
-}
-.lampada i {
-  position: absolute;
-  left: -46px;
-  top: 50px;
-  width: 92px;
-  height: 46px;
-  border-radius: 46px 46px 6px 6px;
-  background: #fff;
-  box-shadow: 0 30px 80px 30px rgba(255, 255, 255, 0.45);
-}
-.ativo .lampada i {
-  animation: liga 1.3s linear 0.4s both;
-}
-
 /* ==========================================================================
    17 · MESMO CORPO (comparador)
    ========================================================================== */
